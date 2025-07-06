@@ -1,0 +1,98 @@
+/*
+ * This CSS provides basic styling for the VideoEngagementXBlock.
+ * For more robust styling, consider using Tailwind CSS directly in the HTML
+ * or integrating with Open edX's theme.
+ */
+
+.video-engagement-xblock {
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 1rem; /* rounded-2xl */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+    margin: 2rem auto;
+    max-width: 960px; /* max-w-4xl */
+    font-family: 'Inter', sans-serif;
+    color: #374151; /* gray-800 */
+}
+
+.video-engagement-xblock h2 {
+    color: #374151; /* gray-700 */
+    margin-bottom: 1rem;
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 600; /* font-semibold */
+}
+
+.video-engagement-xblock video {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+}
+
+.video-engagement-xblock .control-button {
+    padding: 0.75rem 1.5rem; /* px-6 py-3 */
+    background-color: #2563eb; /* bg-blue-600 */
+    color: #ffffff;
+    font-weight: 600; /* font-semibold */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    transition: background-color 0.3s ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+.video-engagement-xblock .control-button:hover {
+    background-color: #1d4ed8; /* hover:bg-blue-700 */
+}
+
+.video-engagement-xblock .control-button-red {
+    padding: 0.75rem 1.5rem;
+    background-color: #dc2626; /* bg-red-600 */
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.3s ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+.video-engagement-xblock .control-button-red:hover {
+    background-color: #b91c1c; /* hover:bg-red-700 */
+}
+
+.video-engagement-xblock .status-box {
+    padding: 1rem;
+    background-color: #1f2937; /* bg-gray-800 */
+    color: #f3f4f6; /* text-gray-100 */
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); /* shadow-inner */
+    font-size: 0.875rem; /* text-sm */
+}
+
+.video-engagement-xblock .status-box strong {
+    color: #e5e7eb; /* gray-200 */
+}
+
+.video-engagement-xblock .relative {
+    position: relative;
+}
+
+.video-engagement-xblock .aspect-video {
+    aspect-ratio: 16 / 9;
+}
+
+.video-engagement-xblock .absolute {
+    position: absolute;
+}
+
+.video-engagement-xblock .top-0 { top: 0; }
+.video-engagement-xblock .left-0 { left: 0; }
+.video-engagement-xblock .w-full { width: 100%; }
+.video-engagement-xblock .h-full { height: 100%; }
+.video-engagement-xblock .object-cover { object-fit: cover; }
+.video-engagement-xblock .flex { display: flex; }
+.video-engagement-xblock .items-center { align-items: center; }
+.video-engagement-xblock .justify-center { justify-content: center; }
+.video-engagement-xblock .overflow-hidden { overflow: hidden; }
