@@ -65,13 +65,9 @@ class VideoEngagementXBlock(XBlock):
         # Initialize the JavaScript with necessary data
         # The 'data' dictionary is passed to the JavaScript's initialization function.
         frag.initialize_js(
-            function_name="VideoEngagementXBlockInit",
             data={
                 "videoUrl": self.video_url,
-                # Generate a URL for the 'track_event' handler.
-                # The .replace('//', '/') is a common workaround for some Open edX URL quirks.
                 "trackEventHandlerUrl": self.runtime.handler_url(self, 'track_event').replace('//', '/'),
-                # Get the current user's username. This requires @XBlock.needs("user")
                 "userId": self.runtime.service(self, "user").get_current_user().opt_attrs['edx-platform.username'],
             }
         )
@@ -131,7 +127,6 @@ class VideoEngagementXBlock(XBlock):
         frag.add_css(self.resource_string("static/css/my_video_tracker_xblock.css"))
         frag.add_javascript(self.resource_string("static/js/my_video_tracker_xblock_edit.js"))
         frag.initialize_js(
-            function_name="VideoEngagementXBlockEditInit",
             data={
                 "videoUrl": self.video_url,
                 "displayName": self.display_name,
