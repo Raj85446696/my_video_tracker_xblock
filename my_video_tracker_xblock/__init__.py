@@ -1,1 +1,1 @@
-from .my_video_tracker_xblock import VideoEngagementXBlock
+from .video_tracker import VideoEngagementXBlock

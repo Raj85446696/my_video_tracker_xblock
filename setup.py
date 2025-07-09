@@ -17,10 +17,8 @@ setup(
     ],
     entry_points={
         'xblock.v1': [
-            # This is the crucial line that tells Open edX about your XBlock
-            # Format: 'xblock_name = python_package_name:XBlockClassName'
-            'my_video_tracker_xblock = my_video_tracker_xblock:VideoEngagementXBlock',
-        ]
+        'my_video_tracker_xblock = my_video_tracker_xblock:VideoEngagementXBlock',
+    ]
     },
     package_data={
         'my_video_tracker_xblock': [
