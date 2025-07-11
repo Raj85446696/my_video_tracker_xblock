@@ -2,6 +2,8 @@ import pkg_resources
 from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Float, Boolean
+from xblock.fields import Integer
+
 import json
 import logging
 
