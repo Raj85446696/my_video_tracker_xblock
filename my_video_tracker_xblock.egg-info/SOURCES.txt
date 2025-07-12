@@ -9,3 +9,8 @@ my_video_tracker_xblock.egg-info/entry_points.txt
 my_video_tracker_xblock.egg-info/not-zip-safe
 my_video_tracker_xblock.egg-info/requires.txt
 my_video_tracker_xblock.egg-info/top_level.txt
+my_video_tracker_xblock/static/css/my_video_tracker_xblock.css
+my_video_tracker_xblock/static/html/my_video_tracker_xblock.html
+my_video_tracker_xblock/static/html/my_video_tracker_xblock_edit.html
+my_video_tracker_xblock/static/js/my_video_tracker_xblock.js
+my_video_tracker_xblock/static/js/my_video_tracker_xblock_edit.js

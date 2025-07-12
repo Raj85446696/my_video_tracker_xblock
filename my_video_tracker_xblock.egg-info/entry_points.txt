@@ -1,2 +1,2 @@
 [xblock.v1]
-my_video_tracker_xblock = my_video_tracker_xblock:VideoEngagementXBlock
+my_video_tracker_xblock = my_video_tracker_xblock.video_engagement_xblock:VideoEngagementXBlock
