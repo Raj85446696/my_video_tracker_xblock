@@ -1,0 +1,27 @@
+Metadata-Version: 2.4
+Name: my-video-tracker-xblock
+Version: 0.1
+Summary: A video engagement tracking XBlock for Open edX with client-side face detection.
+Home-page: https://github.com/Raj85446696/my_video_tracker_xblock
+Author: Ritu Raj Kumar
+Author-email: riturajkumar8544@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Framework :: Open edX
+Description-Content-Type: text/markdown
+Requires-Dist: XBlock
+Requires-Dist: xblock-utils
+Requires-Dist: web-fragments
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary
+
+This is xblock for openEdx
+
+

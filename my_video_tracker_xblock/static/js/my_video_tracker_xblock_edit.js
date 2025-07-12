@@ -1,15 +1,20 @@
-function VideoEngagementXBlockEditInit(runtime, element, data) {
-    const saveButton = element.querySelector('.save-button');
-    const videoUrlInput = element.querySelector('#video_url_input');
-    const displayNameInput = element.querySelector('#display_name_input');
+function StudioXBlockInit(runtime, element, data) {
+    const saveBtn = element.querySelector("#save_settings_btn");
 
-    saveButton.onclick = function() {
-        runtime.post(data.saveHandlerUrl, {
-            video_url: videoUrlInput.value,
-            display_name: displayNameInput.value
-        }).done(function(response) {
-            console.log("Settings saved:", response);
-            // Optionally, provide user feedback
+    saveBtn.addEventListener("click", function () {
+        const displayName = element.querySelector("#display_name_input").value;
+        const videoUrl = element.querySelector("#video_url_input").value;
+
+        runtime.notify('save', {state: 'start'});
+        runtime.ajax('save_settings', {
+            method: 'POST',
+            data: JSON.stringify({
+                display_name: displayName,
+                video_url: videoUrl
+            }),
+            success: function () {
+                runtime.notify('save', {state: 'end'});
+            }
         });
-    };
+    });
 }
