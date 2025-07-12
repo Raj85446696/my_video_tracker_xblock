@@ -1,79 +1,82 @@
-/*
- * This is the frontend JavaScript for the VideoEngagementXBlock.
- * It handles video playback, webcam access, face detection using face-api.js,
- * and sending tracking data to the XBlock's Python backend.
- */
-
 function VideoEngagementXBlockInit(runtime, element, data) {
+    // --- 1. DOM Element Selection ---
+    // Get all the interactive and status elements from the HTML.
     const xblockVideo = element.querySelector('#xblockVideo');
     const xblockWebcamVideo = element.querySelector('#xblockWebcamVideo');
     const xblockFaceDetectionCanvas = element.querySelector('#xblockFaceDetectionCanvas');
-    const xblockWebcamStatus = element.querySelector('#xblockWebcamStatus');
+
+    // Status indicators
     const xblockModelLoadStatus = element.querySelector('#xblockModelLoadStatus');
-
-    const xblockPlayVideoBtn = element.querySelector('#xblockPlayVideoBtn');
-    const xblockPauseVideoBtn = element.querySelector('#xblockPauseVideoBtn');
-    const xblockStartWebcamBtn = element.querySelector('#xblockStartWebcamBtn');
-    const xblockStopWebcamBtn = element.querySelector('#xblockStopWebcamBtn');
-
+    const xblockWebcamStatus = element.querySelector('#xblockWebcamStatus');
     const xblockVideoPlayingStatus = element.querySelector('#xblockVideoPlayingStatus');
     const xblockVideoTimeStatus = element.querySelector('#xblockVideoTimeStatus');
     const xblockTabActiveStatus = element.querySelector('#xblockTabActiveStatus');
     const xblockFaceDetectedStatus = element.querySelector('#xblockFaceDetectedStatus');
+    const xblockTimeWatched = element.querySelector('#xblockTimeWatched');
 
-    // Data passed from Python XBlock
+    // Buttons
+    const xblockStartWebcamBtn = element.querySelector('#xblockStartWebcamBtn');
+    const xblockStopWebcamBtn = element.querySelector('#xblockStopWebcamBtn');
+
+    // --- 2. Data and State Initialization ---
+    // Data passed from the Python XBlock backend
     const videoUrl = data.videoUrl;
-    const trackEventHandlerUrl = data.trackEventHandlerUrl;
+    const trackEventHandlerUrl = data.trackEventHandlerUrl; // This is the URL for our 'track_event' handler
     const userId = data.userId;
 
+    // State variables
     let isTabActive = true;
     let faceDetectionInterval = null;
     let mediaStream = null;
     let modelsLoaded = false;
-    const detectionIntervalTime = 2000; // Milliseconds for face detection and data logging
+    const detectionIntervalTime = 3000; // Milliseconds between each face detection check and data log
 
-    // Set the video source from XBlock data
+    // Set the video source from the XBlock data
     xblockVideo.src = videoUrl;
 
-    // --- Face-API.js Model Loading ---
+    // --- 3. Core Logic: Model Loading, Webcam, and Face Detection ---
+
+    /**
+     * Loads the required face-api.js models from a CDN.
+     * Updates the UI to show the loading status.
+     */
     async function loadModels() {
         try {
-            xblockModelLoadStatus.textContent = "Loading face detection models (this may take a moment)...";
-            // Ensure models are loaded from a reliable source or self-hosted
-            await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights');
-            // await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights'); // Not strictly needed for just detection
+            xblockModelLoadStatus.textContent = "Loading models...";
+            // Using a pinned version of face-api.js for stability
+            const modelUri = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+            await faceapi.nets.tinyFaceDetector.loadFromUri(modelUri);
             modelsLoaded = true;
-            xblockModelLoadStatus.textContent = "Face detection models loaded!";
+            xblockModelLoadStatus.textContent = "Models Loaded ✅";
             console.log('VideoEngagementXBlock: Face-API.js models loaded successfully.');
         } catch (error) {
+            modelsLoaded = false;
             console.error('VideoEngagementXBlock: Error loading face-api.js models:', error);
-            xblockModelLoadStatus.textContent = "Error loading models. Check console.";
+            xblockModelLoadStatus.textContent = "Error loading models. See console.";
         }
     }
 
-    // --- Webcam Control ---
+    /**
+     * Starts the user's webcam and begins the face detection process.
+     */
     async function startWebcam() {
         if (!modelsLoaded) {
-            xblockWebcamStatus.textContent = "Models not loaded yet. Please wait.";
+            xblockWebcamStatus.textContent = "Models are not loaded yet. Please wait.";
             return;
         }
         if (mediaStream) {
-            console.log("VideoEngagementXBlock: Webcam already running.");
+            console.log("VideoEngagementXBlock: Webcam is already running.");
             return;
         }
         try {
-            xblockWebcamStatus.textContent = "Starting webcam...";
+            xblockWebcamStatus.textContent = "Requesting camera access...";
             mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
             xblockWebcamVideo.srcObject = mediaStream;
             xblockWebcamVideo.onloadedmetadata = () => {
                 xblockWebcamVideo.play();
-                // Match canvas dimensions to video stream
-                xblockFaceDetectionCanvas.width = xblockWebcamVideo.videoWidth;
-                xblockFaceDetectionCanvas.height = xblockWebcamVideo.videoHeight;
-                xblockWebcamStatus.textContent = ""; // Clear status once video is playing
+                xblockWebcamStatus.textContent = "Webcam On ✅";
                 console.log('VideoEngagementXBlock: Webcam started.');
-                startFaceDetection();
+                startFaceDetection(); // Begin detection once the webcam is running
             };
         } catch (err) {
             console.error("VideoEngagementXBlock: Error accessing webcam:", err);
@@ -81,6 +84,9 @@ function VideoEngagementXBlockInit(runtime, element, data) {
         }
     }
 
+    /**
+     * Stops the webcam feed and clears the face detection interval.
+     */
     function stopWebcam() {
         if (mediaStream) {
             mediaStream.getTracks().forEach(track => track.stop());
@@ -88,61 +94,61 @@ function VideoEngagementXBlockInit(runtime, element, data) {
             mediaStream = null;
             clearInterval(faceDetectionInterval);
             faceDetectionInterval = null;
-            xblockFaceDetectedStatus.textContent = "No";
-            xblockWebcamStatus.textContent = "Webcam stopped.";
+
+            // Reset UI
+            xblockFaceDetectedStatus.textContent = "N/A";
+            xblockWebcamStatus.textContent = "Webcam Off";
             const context = xblockFaceDetectionCanvas.getContext('2d');
-            context.clearRect(0, 0, xblockFaceDetectionCanvas.width, xblockFaceDetectionCanvas.height); // Clear canvas
+            context.clearRect(0, 0, xblockFaceDetectionCanvas.width, xblockFaceDetectionCanvas.height);
             console.log('VideoEngagementXBlock: Webcam stopped.');
         }
     }
 
-    // --- Face Detection Logic ---
-    async function startFaceDetection() {
-        if (!modelsLoaded || !mediaStream) return;
-
-        const displaySize = { width: xblockWebcamVideo.videoWidth, height: xblockWebcamVideo.videoHeight };
-        faceapi.matchDimensions(xblockFaceDetectionCanvas, displaySize);
+    /**
+     * Sets up a recurring interval to detect faces from the webcam feed.
+     */
+    function startFaceDetection() {
+        if (!modelsLoaded || !mediaStream || faceDetectionInterval) return;
 
         faceDetectionInterval = setInterval(async () => {
-            if (!xblockWebcamVideo.paused && !xblockWebcamVideo.ended) {
-                const detections = await faceapi.detectAllFaces(xblockWebcamVideo, new faceapi.TinyFaceDetectorOptions());
-                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                const context = xblockFaceDetectionCanvas.getContext('2d');
-                context.clearRect(0, 0, xblockFaceDetectionCanvas.width, xblockFaceDetectionCanvas.height);
-                faceapi.draw.drawDetections(xblockFaceDetectionCanvas, resizedDetections);
+            if (xblockWebcamVideo.paused || xblockWebcamVideo.ended) return;
 
-                const faceDetected = resizedDetections.length > 0;
-                xblockFaceDetectedStatus.textContent = faceDetected ? "Yes" : "No";
+            const displaySize = { width: xblockWebcamVideo.videoWidth, height: xblockWebcamVideo.videoHeight };
+            faceapi.matchDimensions(xblockFaceDetectionCanvas, displaySize);
 
-                // Send data to backend
-                sendTrackingData(faceDetected);
-            }
+            const detections = await faceapi.detectAllFaces(xblockWebcamVideo, new faceapi.TinyFaceDetectorOptions());
+            const faceDetected = detections.length > 0;
+
+            // Update UI status
+            xblockFaceDetectedStatus.textContent = faceDetected ? "Yes ✅" : "No ❌";
+
+            // Draw detection boxes on the canvas for visual feedback
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            const context = xblockFaceDetectionCanvas.getContext('2d');
+            context.clearRect(0, 0, xblockFaceDetectionCanvas.width, xblockFaceDetectionCanvas.height);
+            faceapi.draw.drawDetections(xblockFaceDetectionCanvas, resizedDetections);
+
+            // Send the latest data to the backend
+            sendTrackingData(faceDetected);
+
         }, detectionIntervalTime);
     }
 
-    // --- Video Playback Control ---
-    xblockPlayVideoBtn.addEventListener('click', () => {
-        xblockVideo.play();
-        xblockVideoPlayingStatus.textContent = "Yes";
-    });
+    // --- 4. Event Listeners ---
 
-    xblockPauseVideoBtn.addEventListener('click', () => {
-        xblockVideo.pause();
-        xblockVideoPlayingStatus.textContent = "No";
-        sendTrackingData(xblockFaceDetectedStatus.textContent === "Yes"); // Send data on manual pause
-    });
-
+    // Listen for main video playback events
     xblockVideo.addEventListener('play', () => {
         xblockVideoPlayingStatus.textContent = "Yes";
-        // Start sending data more frequently when video plays
-        if (!faceDetectionInterval && modelsLoaded && mediaStream) {
-            startFaceDetection();
-        }
     });
 
     xblockVideo.addEventListener('pause', () => {
         xblockVideoPlayingStatus.textContent = "No";
-        sendTrackingData(xblockFaceDetectedStatus.textContent === "Yes"); // Send data on auto-pause/end
+        sendTrackingData(xblockFaceDetectedStatus.textContent.startsWith("Yes")); // Send data on manual pause
+    });
+
+    xblockVideo.addEventListener('ended', () => {
+        xblockVideoPlayingStatus.textContent = "No (Ended)";
+        sendTrackingData(xblockFaceDetectedStatus.textContent.startsWith("Yes")); // Send data when video finishes
     });
 
     xblockVideo.addEventListener('timeupdate', () => {
@@ -151,56 +157,66 @@ function VideoEngagementXBlockInit(runtime, element, data) {
         xblockVideoTimeStatus.textContent = `${minutes}:${seconds}`;
     });
 
-    xblockVideo.addEventListener('ended', () => {
-        xblockVideoPlayingStatus.textContent = "No (Ended)";
-        sendTrackingData(xblockFaceDetectedStatus.textContent === "Yes"); // Send data when video ends
-    });
-
-    // --- Tab Change Detection ---
+    // Listen for tab visibility changes
     document.addEventListener('visibilitychange', () => {
         isTabActive = !document.hidden;
         xblockTabActiveStatus.textContent = isTabActive ? "Yes" : "No";
-        console.log(`VideoEngagementXBlock: Tab visibility changed: ${isTabActive ? 'Active' : 'Hidden'}`);
-        sendTrackingData(xblockFaceDetectedStatus.textContent === "Yes"); // Send data on visibility change
+        console.log(`VideoEngagementXBlock: Tab visibility changed to: ${isTabActive ? 'Active' : 'Hidden'}`);
 
-        // Pause video if tab is hidden
+        // Automatically pause the video if the user switches tabs
         if (document.hidden && !xblockVideo.paused) {
             xblockVideo.pause();
             xblockVideoPlayingStatus.textContent = "No (Tab Hidden)";
         }
+        // Send an immediate update when visibility changes
+        sendTrackingData(xblockFaceDetectedStatus.textContent.startsWith("Yes"));
     });
 
-    // --- Send Data to XBlock Backend Handler ---
+    // Listen for button clicks
+    xblockStartWebcamBtn.addEventListener('click', startWebcam);
+    xblockStopWebcamBtn.addEventListener('click', stopWebcam);
+
+
+    // --- 5. Backend Communication ---
+
+    /**
+     * Sends tracking data to the Python backend using a standard AJAX POST request.
+     * @param {boolean} faceDetected - The current status of face detection.
+     */
     function sendTrackingData(faceDetected) {
+        // Only send data if the webcam is active and has determined a face status
+        if (!mediaStream) {
+            return;
+        }
+
         const dataToSend = {
-            timestamp: new Date().toISOString(),
-            videoUrl: xblockVideo.src,
             currentTime: xblockVideo.currentTime,
             isPlaying: !xblockVideo.paused && !xblockVideo.ended,
             isTabActive: isTabActive,
             faceDetected: faceDetected,
-            userId: userId // User ID from XBlock initialization data
         };
 
-        // Use the XBlock runtime to make the AJAX call to the Python handler
-        runtime.ajax(
-            'track_event', // The name of the handler method in Python
-            dataToSend,    // The data to send
-            {
-                success: function(response) {
-                    console.log('VideoEngagementXBlock: Data sent successfully:', response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('VideoEngagementXBlock: Error sending data:', error);
+        // Use jQuery's ajax, which is standard in the Open edX platform.
+        $.ajax({
+            type: "POST",
+            url: trackEventHandlerUrl, // The URL to the 'track_event' handler
+            data: JSON.stringify(dataToSend),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function(response) {
+                console.log('VideoEngagementXBlock: Data sent successfully. Response:', response);
+                // Update the "Total Time Watched" display with the value from the server
+                if (response.total_watch_time !== undefined) {
+                    xblockTimeWatched.textContent = `${Math.round(response.total_watch_time)}s`;
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error('VideoEngagementXBlock: Error sending data:', xhr.responseText);
             }
-        );
+        });
     }
 
-    // --- Event Listeners for buttons ---
-    xblockStartWebcamBtn.addEventListener('click', startWebcam);
-    xblockStopWebcamBtn.addEventListener('click', stopWebcam);
-
-    // Initial setup: Load models when the XBlock is initialized
+    // --- 6. Initial Call ---
+    // Start the process by loading the face detection models as soon as the XBlock is loaded.
     loadModels();
 }

@@ -23,21 +23,21 @@ setup(
     description="Custom video tracker XBlock for Open edX",
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/yourname/my-video-tracker-xblock',
+    url='https://github.com/Raj85446696/my_video_tracker_xblock',
     license='AGPL v3',
     author='Rahul',
-    packages=find_packages(
-        include=['my_video_tracker', 'my_video_tracker.*'],
-        exclude=["*tests"],
-    ),
+    packages=find_packages(exclude=["*tests"]),
     install_requires=[
         'XBlock',
         'xblock-utils',
+        'requests',  # Added missing dependency
     ],
     entry_points={
         'xblock.v1': [
-            'my_video_tracker = my_video_tracker:MyVideoTrackerXBlock',
+            # Corrected entry point:
+            # 'tag_name_in_studio = package_name.file_name:ClassName'
+            'my_video_tracker_xblock = my_video_tracker_xblock.video_tracker:VideoEngagementXBlock',
         ]
     },
-    package_data=package_data("my_video_tracker", ["static", "public"]),
+    package_data=package_data("my_video_tracker_xblock", ["static", "public"]),
 )

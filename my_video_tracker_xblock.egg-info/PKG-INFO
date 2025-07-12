@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: my_video_tracker_xblock
-Version: 0.1
-Summary: An Open edX XBlock for tracking video engagement with face detection and YouTube integration.
-Requires-Dist: XBlock
-Requires-Dist: web-fragments
-Requires-Dist: requests
-Dynamic: requires-dist
-Dynamic: summary

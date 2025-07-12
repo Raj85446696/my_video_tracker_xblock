@@ -8,12 +8,26 @@
         <button id="xblockStartWebcamBtn">Start Webcam</button>
         <button id="xblockStopWebcamBtn">Stop Webcam</button>
     </div>
-    <video id="xblockWebcamVideo" autoplay muted style="width: 100%; height: auto;"></video>
-    <canvas id="xblockFaceDetectionCanvas" style="position: absolute; top: 0; left: 0;"></canvas>
-    <div class="tracking-status">
+
+    <!-- A container to help position the canvas over the webcam feed -->
+    <div style="position: relative; width: 50%; margin-top: 10px;">
+        <video id="xblockWebcamVideo" autoplay muted playsinline
+               style="width: 100%; height: auto; border: 1px solid #ccc;"></video>
+        <canvas id="xblockFaceDetectionCanvas"
+                style="position: absolute; top: 0; left: 0;"></canvas>
+    </div>
+
+    <!-- Status indicators for better user feedback -->
+    <div class="tracking-status" style="margin-top: 15px; padding: 10px; border: 1px solid #eee;">
+        <h4>Tracking Status</h4>
+        <p>Models: <span id="xblockModelLoadStatus">Loading...</span></p>
+        <p>Webcam: <span id="xblockWebcamStatus">Off</span></p>
+        <hr>
         <p>Video Playing: <span id="xblockVideoPlayingStatus">No</span></p>
+        <p>Current Time: <span id="xblockVideoTimeStatus">0:00</span></p>
         <p>Face Detected: <span id="xblockFaceDetectedStatus">No</span></p>
         <p>Tab Active: <span id="xblockTabActiveStatus">Yes</span></p>
-        <p>Time Watched: <span id="xblockTimeWatched">0s</span></p>
+        <!-- Added the missing element for total time watched -->
+        <p><strong>Total Time Watched: <span id="xblockTimeWatched">0s</span></strong></p>
     </div>
 </div>
