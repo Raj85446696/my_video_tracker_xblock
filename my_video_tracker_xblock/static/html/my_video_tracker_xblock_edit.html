@@ -1,10 +1,11 @@
-<!-- my_video_tracker_xblock/static/html/my_video_tracker_xblock_edit.html -->
-<div class="xblock-edit">
-    <label>Display Name:</label>
-    <input type="text" id="display_name_input" value="{display_name}" />
-
-    <label>Video URL:</label>
-    <input type="text" id="video_url_input" value="{video_url}" />
-
-    <button id="save_settings_btn">Save</button>
+<div class="wrapper-class-name">
+  <div class="edit-wrapper">
+    <label class="label edit-label" for="video_url_input">Video URL</label>
+    <input class="input edit-input" type="text" id="video_url_input" value="{video_url}" />
+    <label class="label edit-label" for="display_name_input">Display Name</label>
+    <input class="input edit-input" type="text" id="display_name_input" value="{display_name}" />
+    <span class="save-button-row">
+      <button class="save-button">Save</button>
+    </span>
+  </div>
 </div>

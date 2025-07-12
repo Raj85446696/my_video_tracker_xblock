@@ -1,20 +1,17 @@
-function StudioXBlockInit(runtime, element, data) {
-    const saveBtn = element.querySelector("#save_settings_btn");
+function MyVideoTrackerXBlockEdit(runtime, element) {
+  $(element).find('.save-button').bind('click', function() {
+    var handlerUrl = runtime.handlerUrl(element, 'save_settings');
+    var data = {
+      display_name: $(element).find('#display_name_input').val(),
+      video_url: $(element).find('#video_url_input').val()
+    };
 
-    saveBtn.addEventListener("click", function () {
-        const displayName = element.querySelector("#display_name_input").value;
-        const videoUrl = element.querySelector("#video_url_input").value;
-
-        runtime.notify('save', {state: 'start'});
-        runtime.ajax('save_settings', {
-            method: 'POST',
-            data: JSON.stringify({
-                display_name: displayName,
-                video_url: videoUrl
-            }),
-            success: function () {
-                runtime.notify('save', {state: 'end'});
-            }
-        });
+    $.post(handlerUrl, JSON.stringify(data)).done(function(response) {
+      if (response.status === 'success') {
+        window.location.reload(false);
+      } else {
+        alert("Error saving settings: " + response.message);
+      }
     });
+  });
 }
