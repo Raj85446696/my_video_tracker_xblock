@@ -1,33 +1,52 @@
-<!-- my_video_tracker_xblock/static/html/my_video_tracker_xblock.html -->
 <div class="video-engagement-xblock">
-    <video id="xblockVideo" controls class="w-full h-auto"
-           src="{video_url}" preload="auto">
-        Your browser does not support the video tag.
-    </video>
-    <div class="mt-4">
-        <button id="xblockStartWebcamBtn">Start Webcam</button>
-        <button id="xblockStopWebcamBtn">Stop Webcam</button>
-    </div>
+  <!-- 🔁 Dynamic Video Container (YouTube or .mp4) -->
+  <h2>{display_name}</h2>
+  <div id="videoContainer"></div>
 
-    <!-- A container to help position the canvas over the webcam feed -->
-    <div style="position: relative; width: 50%; margin-top: 10px;">
-        <video id="xblockWebcamVideo" autoplay muted playsinline
-               style="width: 100%; height: auto; border: 1px solid #ccc;"></video>
-        <canvas id="xblockFaceDetectionCanvas"
-                style="position: absolute; top: 0; left: 0;"></canvas>
-    </div>
+  <!-- 🎥 Webcam View -->
+  <div style="position: relative; width: 50%; margin-top: 10px">
+    <video
+      id="xblockWebcamVideo"
+      autoplay
+      muted
+      playsinline
+      style="width: 100%; height: auto; border: 1px solid #ccc"
+    ></video>
+    <canvas
+      id="xblockFaceDetectionCanvas"
+      style="position: absolute; top: 0; left: 0"
+    ></canvas>
+  </div>
 
-    <!-- Status indicators for better user feedback -->
-    <div class="tracking-status" style="margin-top: 15px; padding: 10px; border: 1px solid #eee;">
-        <h4>Tracking Status</h4>
-        <p>Models: <span id="xblockModelLoadStatus">Loading...</span></p>
-        <p>Webcam: <span id="xblockWebcamStatus">Off</span></p>
-        <hr>
-        <p>Video Playing: <span id="xblockVideoPlayingStatus">No</span></p>
-        <p>Current Time: <span id="xblockVideoTimeStatus">0:00</span></p>
-        <p>Face Detected: <span id="xblockFaceDetectedStatus">No</span></p>
-        <p>Tab Active: <span id="xblockTabActiveStatus">Yes</span></p>
-        <!-- Added the missing element for total time watched -->
-        <p><strong>Total Time Watched: <span id="xblockTimeWatched">0s</span></strong></p>
-    </div>
+  <!-- 📊 Status Panel -->
+  <div
+    class="tracking-status"
+    style="margin-top: 15px; padding: 10px; border: 1px solid #eee"
+  >
+    <h4>Tracking Status</h4>
+    <p>Models: <span id="xblockModelLoadStatus">Loading...</span></p>
+    <p>Webcam: <span id="xblockWebcamStatus">Off</span></p>
+    <hr />
+    <p>Video Playing: <span id="xblockVideoPlayingStatus">No</span></p>
+    <p>Current Time: <span id="xblockVideoTimeStatus">0:00</span></p>
+    <p>Face Detected: <span id="xblockFaceDetectedStatus">No</span></p>
+    <p>Tab Active: <span id="xblockTabActiveStatus">Yes</span></p>
+    <p>
+      <strong
+        >Total Time Watched: <span id="xblockTimeWatched">0s</span></strong
+      >
+    </p>
+  </div>
 </div>
+
+<!-- 🔻 Load face-api.js -->
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<!-- 🔻 Data passed from backend -->
+<script>
+  window.videoTrackerData = {
+    videoUrl: "{video_url}", // Supports YouTube or MP4
+    trackEventHandlerUrl: "{track_event_url}",
+    userId: "{user_id}",
+  };
+</script>
