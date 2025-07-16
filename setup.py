@@ -5,6 +5,7 @@ setup(
     version='0.1',
     description='An XBlock that tracks video engagement.',
     packages=['my_video_tracker_xblock'],
+    include_package_data=True,
     install_requires=[
         "opencv-python",
         "numpy",
