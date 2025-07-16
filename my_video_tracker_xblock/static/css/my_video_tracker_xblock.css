@@ -1,83 +1,81 @@
-/* Main container */
 .video-engagement-xblock {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* Video element */
-#xblockVideo {
-  width: 100%;
-  height: auto;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+.video-engagement-xblock h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: #2c3e50;
+  text-align: center;
 }
 
-/* Webcam + Canvas container */
-.video-engagement-xblock > div[style*="position: relative"] {
-  margin-top: 1.5rem;
-  position: relative;
-  width: 100%;
-}
-
+#videoContainer video,
 #xblockWebcamVideo {
   width: 100%;
-  border-radius: 6px;
+  height: auto;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-#xblockFaceDetectionCanvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-/* Buttons */
-#xblockStartWebcamBtn,
-#xblockStopWebcamBtn {
-  margin-right: 0.75rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
-  background-color: #007bff;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-#xblockStartWebcamBtn:hover,
-#xblockStopWebcamBtn:hover {
-  background-color: #0056b3;
-}
-
-/* Tracking status box */
 .tracking-status {
-  margin-top: 2rem;
-  padding: 1rem 1.2rem;
+  background: #ffffff;
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 10px;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  background-color: #fafafa;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .tracking-status h4 {
-  margin-bottom: 1rem;
-  color: #555;
+  margin-bottom: 12px;
+  font-size: 18px;
+  color: #34495e;
 }
 
 .tracking-status p {
-  margin: 0.4rem 0;
-  font-size: 0.95rem;
+  margin: 8px 0;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .tracking-status span {
   font-weight: bold;
+  color: #2980b9;
 }
+
+.tracking-status hr {
+  margin: 12px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  .video-engagement-xblock {
+    padding: 10px;
+  }
+
+  .tracking-status {
+    padding: 10px;
+  }
+
+  .video-engagement-xblock h2 {
+    font-size: 20px;
+  }
+
+  .tracking-status h4 {
+    font-size: 16px;
+  }
+}
+
     
 .video-tracker-edit {
   max-width: 600px;

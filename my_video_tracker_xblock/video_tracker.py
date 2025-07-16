@@ -5,6 +5,12 @@ from xblock.core import XBlock
 import json
 import logging
 import requests
+import base64
+import cv2
+import numpy as np
+from io import BytesIO
+from PIL import Image
+
 
 log = logging.getLogger(__name__)
 
@@ -25,28 +31,6 @@ class VideoEngagementXBlock(XBlock):
 
     def resource_string(self, path):
         return pkg_resources.resource_string(__name__, path).decode("utf8")
-
-    # def student_view(self, context=None):
-    #     # 👇 Conditionally render the studio view in workbench
-    #     if self.mode == "studio":
-    #         return self.studio_view(context)
-
-    #     html_str = self.resource_string("static/html/my_video_tracker_xblock.html")
-    #     html_str = html_str.replace("{video_url}", self.video_url)
-    #     frag = Fragment(html_str)
-    #     frag.add_css(self.resource_string("static/css/my_video_tracker_xblock.css"))
-    #     frag.add_javascript(
-    #         self.resource_string("static/js/my_video_tracker_xblock.js")
-    #     )
-    #     frag.initialize_js(
-    #         "VideoEngagementXBlockInit",
-    #         {
-    #             "videoUrl": self.video_url,
-    #             "trackEventHandlerUrl": self.runtime.handler_url(self, "track_event"),
-    #             "userId": self.scope_ids.user_id,
-    #         },
-    #     )
-    #     return frag
 
     def student_view(self, context=None):
         if self.mode == "studio":
@@ -75,25 +59,42 @@ class VideoEngagementXBlock(XBlock):
 
     @XBlock.json_handler
     def track_event(self, data, suffix=""):
-        user_service = self.runtime.service(self, "user")
-        user = user_service.get_current_user()
-        user_id = (
-            user.opt_attrs.get("edx-platform.username", "anonymous")
-            if user
-            else "anonymous"
-        )
+        image_data = data.get("image")
+        face_detected = False
+        if image_data:
+            try:
+                header, encoded = image_data.split(",", 1)
+                img_bytes = base64.b64decode(encoded)
+                img_array = np.array(Image.open(BytesIO(img_bytes)))
+                img = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+
+                face_cascade = cv2.CascadeClassifier(
+                    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+                )
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                faces = face_cascade.detectMultiScale(
+                    gray, scaleFactor=1.1, minNeighbors=5
+                )
+
+                face_detected = len(faces) > 0
+
+            except Exception as e:
+                log.error(f"Face detection error: {str(e)}")
+
         current_time = data.get("currentTime", 0.0)
-        if data.get("isPlaying") and data.get("isTabActive"):
+        if data.get("isPlaying") and data.get("isTabActive") and face_detected:
             time_diff = current_time - self.last_tracked_time
             if 0 < time_diff < 5:
                 self.total_watch_time += time_diff
             self.last_tracked_time = current_time
         else:
             self.last_tracked_time = current_time
-        log.info(
-            f"User {user_id} - Time: {current_time:.2f}s, Watch Time: {self.total_watch_time:.2f}s"
-        )
-        return {"status": "success", "total_watch_time": self.total_watch_time}
+
+        return {
+            "status": "success",
+            "total_watch_time": self.total_watch_time,
+            "face_detected": face_detected,
+        }
 
     def studio_view(self, context=None):
         html_str = self.resource_string("static/html/my_video_tracker_xblock_edit.html")
