@@ -1,3 +1,4 @@
 recursive-include my_video_tracker_xblock/static *
 recursive-include my_video_tracker_xblock/public *
 include README.md
+include my_video_tracker_xblock/*.py
