@@ -40,7 +40,7 @@ class VideoEngagementXBlock(XBlock):
         html_str = html_str.replace("{video_url}", self.video_url)
         html_str = html_str.replace(
             "{display_name}", self.display_name
-        )  # 👈 Add this line
+        ) 
         frag = Fragment(html_str)
         frag.add_css(self.resource_string("static/css/my_video_tracker_xblock.css"))
         frag.add_javascript(

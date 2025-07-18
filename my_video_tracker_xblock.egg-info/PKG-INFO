@@ -2,4 +2,11 @@ Metadata-Version: 2.4
 Name: my_video_tracker_xblock
 Version: 0.1
 Summary: An XBlock that tracks video engagement.
+Requires-Dist: opencv-python
+Requires-Dist: numpy
+Requires-Dist: Pillow
+Requires-Dist: requests
+Requires-Dist: web-fragments
+Requires-Dist: xblock
+Dynamic: requires-dist
 Dynamic: summary
