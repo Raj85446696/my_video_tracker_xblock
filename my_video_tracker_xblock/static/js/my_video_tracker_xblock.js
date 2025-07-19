@@ -3,10 +3,14 @@ window.VideoEngagementXBlockInit = function (runtime, element, data) {
   const trackEventHandlerUrl = data.trackEventHandlerUrl;
 
   const xblockWebcamVideo = element.querySelector("#xblockWebcamVideo");
-  const xblockVideoPlayingStatus = element.querySelector("#xblockVideoPlayingStatus");
+  const xblockVideoPlayingStatus = element.querySelector(
+    "#xblockVideoPlayingStatus"
+  );
   const xblockVideoTimeStatus = element.querySelector("#xblockVideoTimeStatus");
   const xblockTabActiveStatus = element.querySelector("#xblockTabActiveStatus");
-  const xblockFaceDetectedStatus = element.querySelector("#xblockFaceDetectedStatus");
+  const xblockFaceDetectedStatus = element.querySelector(
+    "#xblockFaceDetectedStatus"
+  );
   const xblockTimeWatched = element.querySelector("#xblockTimeWatched");
   const xblockWebcamStatus = element.querySelector("#xblockWebcamStatus");
 
@@ -22,46 +26,74 @@ window.VideoEngagementXBlockInit = function (runtime, element, data) {
                                 </video>`;
     xblockVideo = videoContainer.querySelector("#xblockVideo");
 
-    xblockVideo.addEventListener("play", () => xblockVideoPlayingStatus.textContent = "Yes");
-    xblockVideo.addEventListener("pause", () => xblockVideoPlayingStatus.textContent = "No");
+    xblockVideo.addEventListener(
+      "play",
+      () => (xblockVideoPlayingStatus.textContent = "Yes")
+    );
+    xblockVideo.addEventListener(
+      "pause",
+      () => (xblockVideoPlayingStatus.textContent = "No")
+    );
     xblockVideo.addEventListener("timeupdate", () => {
       currentTime = xblockVideo.currentTime;
       const mins = Math.floor(currentTime / 60);
-      const secs = Math.floor(currentTime % 60).toString().padStart(2, "0");
+      const secs = Math.floor(currentTime % 60)
+        .toString()
+        .padStart(2, "0");
       xblockVideoTimeStatus.textContent = `${mins}:${secs}`;
     });
   }
 
   async function startWebcam() {
     try {
+      // ✅ Smart check: if getUserMedia is undefined, exit early with a helpful message
+      if (
+        !navigator.mediaDevices ||
+        typeof navigator.mediaDevices.getUserMedia !== "function"
+      ) {
+        xblockWebcamStatus.textContent =
+          "❌ Camera not supported or blocked (insecure context or iframe).";
+        console.warn(
+          "getUserMedia is not available — likely due to insecure context (not HTTPS) or iframe sandboxing."
+        );
+        return;
+      }
+
       xblockWebcamStatus.textContent = "Requesting camera access...";
+
       mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
       xblockWebcamVideo.srcObject = mediaStream;
+
       xblockWebcamVideo.onloadedmetadata = () => {
         xblockWebcamVideo.play();
-        xblockWebcamStatus.textContent = "Webcam On ✅";
-
-        setInterval(captureAndSendFrame, 4000);  // every 4 seconds
+        xblockWebcamStatus.textContent = "✅ Webcam On";
+        setInterval(captureAndSendFrame, 4000);
       };
     } catch (err) {
-      xblockWebcamStatus.textContent = "Webcam Error: " + err.name;
-      console.error(err);
+      let message = "Webcam Error: " + err.name;
+      if (err.name === "NotAllowedError") {
+        message = "❌ Camera permission denied.";
+      } else if (err.name === "NotFoundError") {
+        message = "❌ No webcam device found.";
+      }
+      xblockWebcamStatus.textContent = message;
+      console.error(message, err);
     }
   }
 
   function captureAndSendFrame() {
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = xblockWebcamVideo.videoWidth;
     canvas.height = xblockWebcamVideo.videoHeight;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.drawImage(xblockWebcamVideo, 0, 0, canvas.width, canvas.height);
-    const imageData = canvas.toDataURL('image/jpeg');
+    const imageData = canvas.toDataURL("image/jpeg");
 
     const payload = {
       image: imageData,
       currentTime: currentTime,
       isPlaying: !xblockVideo.paused,
-      isTabActive: isTabActive
+      isTabActive: isTabActive,
     };
 
     $.ajax({
@@ -71,7 +103,9 @@ window.VideoEngagementXBlockInit = function (runtime, element, data) {
       contentType: "application/json",
       dataType: "json",
       success: function (res) {
-        xblockFaceDetectedStatus.textContent = res.face_detected ? "Yes ✅" : "No ❌";
+        xblockFaceDetectedStatus.textContent = res.face_detected
+          ? "Yes ✅"
+          : "No ❌";
         xblockTimeWatched.textContent = `${Math.round(res.total_watch_time)}s`;
       },
       error: function (xhr) {
