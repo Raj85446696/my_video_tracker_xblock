@@ -54,7 +54,8 @@ class VideoEngagementXBlock(XBlock):
                 "userId": self.scope_ids.user_id,
             },
         )
-
+        # for disable sandbox
+        frag.set_sandbox_level(None)
         return frag
 
     @XBlock.json_handler
